@@ -1,6 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+import uuid
+
 from .models import Product
 from .serializers import ProductSerializer
 from django.shortcuts import get_object_or_404
@@ -15,13 +17,16 @@ class ProductListCreateView(APIView):
 
     def post(self, request):
         payload = request.data
+
         match payload:
             case {'name': str(name), 'price': price}:
+                payload['sku'] = str(uuid.uuid4())[:8]
                 serializer = ProductSerializer(data=payload)
                 if serializer.is_valid():
                     serializer.save()
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
             case {'sku': str(sku)}:
                 try:
                     product = Product.objects.get(sku=sku)
