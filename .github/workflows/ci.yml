@@ -104,4 +104,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest products/tests.py --maxfail=1 --disable-warnings -q
+          python manage.py test products
