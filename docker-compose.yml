@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: my-postgres-container
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+  redis:
+    image: redis:7
+    container_name: my-redis-container
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  web:
+    build: .
+    container_name: my-django-app
+    command: >
+      bash -c "python manage.py migrate &&
+               python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+      - REDIS_URL=redis://redis:6379/0
+      # DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB}
+    depends_on:
+      - db
+      - redis
+
+volumes:
+  postgres_data:
+  redis_data:

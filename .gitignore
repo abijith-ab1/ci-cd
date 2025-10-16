@@ -1,0 +1,115 @@
+# ========================
+# Python
+# ========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.whl
+*.manifest
+*.spec
+*.so
+
+# Virtual environments
+.env
+.env.*
+venv/
+.venv/
+env/
+ENV/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ========================
+# Django
+# ========================
+*.log
+*.pot
+*.pyc
+*.sqlite3
+db.sqlite3
+local_settings.py
+media/
+staticfiles/
+static/
+*.mo
+*.pot
+
+# ========================
+# VS Code / IDEs
+# ========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ========================
+# Docker
+# ========================
+# Keep Dockerfile and docker-compose.yml tracked!
+# Ignore environment or local override files
+*.pid
+*.swp
+.docker/
+**/Dockerfile.*
+docker-compose.override.yml
+docker-compose.override.yaml
+
+# ========================
+# Kubernetes / Helm
+# ========================
+.kube/
+*.kubeconfig
+helm-charts/
+# Ignore only secret files, keep manifests (for CD)
+*secret*.yaml
+
+# ========================
+# GitHub Actions / CI
+# ========================
+# Keep workflow files tracked!
+ci_reports/
+test_reports/
+
+# ========================
+# macOS / Windows / Linux
+# ========================
+.DS_Store
+Thumbs.db
+*.bak
+*.tmp
+*.swp
+
+# ========================
+# Coverage / Testing
+# ========================
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.pytest_cache/
+pytestdebug.log
+
+# ========================
+# Jupyter Notebooks
+# ========================
+.ipynb_checkpoints/
+
+# ========================
+# Logs
+# ========================
+logs/
+*.log
+
+# ========================
+# Redis / Celery
+# ========================
+celerybeat-schedule
+celerybeat.pid

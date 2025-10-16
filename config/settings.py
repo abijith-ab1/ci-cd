@@ -1,0 +1,112 @@
+import os
+from pathlib import Path
+from django.core.management.utils import get_random_secret_key
+from dotenv import load_dotenv
+
+load_dotenv()
+
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+SECRET_KEY = os.getenv('SECRET_KEY', get_random_secret_key())
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+INSTALLED_APPS = [
+'django.contrib.admin',
+'django.contrib.auth',
+'django.contrib.contenttypes',
+'django.contrib.sessions',
+'django.contrib.messages',
+'django.contrib.staticfiles',
+'rest_framework',
+'products',
+]
+
+
+MIDDLEWARE = [
+'django.middleware.security.SecurityMiddleware',
+'django.contrib.sessions.middleware.SessionMiddleware',
+'django.middleware.common.CommonMiddleware',
+'django.middleware.csrf.CsrfViewMiddleware',
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
+'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+
+ROOT_URLCONF = 'config.urls'
+
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+
+WSGI_APPLICATION = 'config.wsgi.application'
+
+
+# Database (Postgres)
+POSTGRES_DB = os.getenv('POSTGRES_DB', 'postgres')
+POSTGRES_USER = os.getenv('POSTGRES_USER', 'postgres')
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
+POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
+
+
+DATABASES = {
+'default': {
+'ENGINE': 'django.db.backends.postgresql',
+'NAME': POSTGRES_DB,
+'USER': POSTGRES_USER,
+'PASSWORD': POSTGRES_PASSWORD,
+'HOST': POSTGRES_HOST,
+'PORT': POSTGRES_PORT,
+}
+}
+
+# Caching via Redis
+REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+CACHES = {
+'default': {
+'BACKEND': 'django_redis.cache.RedisCache',
+'LOCATION': REDIS_URL,
+'OPTIONS': {
+'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+}
+}
+}
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+SESSION_CACHE_ALIAS = 'default'
+
+
+# DRF
+REST_FRAMEWORK = {
+'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+'PAGE_SIZE': 10,
+}
+
+
+# Static
+STATIC_URL = '/static/'
+
+
+# Security best practices (override in prod)
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = True

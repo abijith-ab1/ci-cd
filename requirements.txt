@@ -1,0 +1,11 @@
+Django>=4.2,<5
+djangorestframework
+psycopg2-binary
+redis
+django-redis
+gunicorn
+pytest
+pytest-django
+coverage
+python-dotenv
+requests
