@@ -59,23 +59,16 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Database (Postgres)
-POSTGRES_DB = os.getenv('POSTGRES_DB', 'postgres')
-POSTGRES_USER = os.getenv('POSTGRES_USER', 'postgres')
-POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
-POSTGRES_HOST = os.getenv('POSTGRES_HOST', 'localhost')
-POSTGRES_PORT = os.getenv('POSTGRES_PORT', '5432')
-
-
+# Database
 DATABASES = {
-'default': {
-'ENGINE': 'django.db.backends.postgresql',
-'NAME': POSTGRES_DB,
-'USER': POSTGRES_USER,
-'PASSWORD': POSTGRES_PASSWORD,
-'HOST': POSTGRES_HOST,
-'PORT': POSTGRES_PORT,
-}
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": os.environ.get("POSTGRES_DB", "test_db"),
+        "USER": os.environ.get("POSTGRES_USER", "postgres"),
+        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", "postgres"),
+        "HOST": os.environ.get("POSTGRES_HOST", "localhost"),
+        "PORT": os.environ.get("POSTGRES_PORT", "5432"),
+    }
 }
 
 # Caching via Redis

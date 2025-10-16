@@ -41,7 +41,12 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: postgres
-        run: python manage.py migrate --noinput
+        run: |
+          until pg_isready -h $POSTGRES_HOST -p 5432; do
+            echo "Waiting for Postgres..."
+            sleep 1
+          done
+          python manage.py migrate --noinput
 
       - name: Run tests
         env:
