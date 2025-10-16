@@ -13,6 +13,8 @@ jobs:
           POSTGRES_DB: test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd "pg_isready -U postgres"
           --health-interval 10s
@@ -21,6 +23,8 @@ jobs:
 
       redis:
         image: redis:7
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
@@ -41,12 +45,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: postgres
-        run: |
-          until pg_isready -h $POSTGRES_HOST -p 5432; do
-            echo "Waiting for Postgres..."
-            sleep 1
-          done
-          python manage.py migrate --noinput
+        run: python manage.py migrate --noinput
 
       - name: Run tests
         env:
