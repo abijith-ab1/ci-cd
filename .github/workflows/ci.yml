@@ -95,13 +95,21 @@ jobs:
 
       - name: Run migrations
         env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST: 127.0.0.1
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: postgres
         run: |
+          until pg_isready -h $POSTGRES_HOST -p 5432; do
+            echo "Waiting for Postgres..."
+            sleep 1
+          done
           python manage.py migrate --noinput
 
       - name: Run tests
-        run: |
-          python manage.py test products
+        env:
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_HOST: postgres
+        run: python manage.py test products
