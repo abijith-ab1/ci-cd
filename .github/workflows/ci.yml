@@ -18,6 +18,8 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 5
+        ports:
+          - 5432:5432  # optional but helps in debugging
 
       redis:
         image: redis:7
@@ -35,10 +37,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Wait for Postgres
+      # ✅ Proper Postgres wait (instead of sleep)
+      - name: Wait for Postgres to be ready
         run: |
-          echo "Waiting for Postgres to be ready..."
-          sleep 10  # Simple fixed wait to ensure Postgres is up
+          echo "Waiting for Postgres service..."
+          until pg_isready -h postgres -U postgres -d test_db; do
+            echo "Postgres not ready yet..."
+            sleep 2
+          done
+          echo "Postgres is ready!"
 
       - name: Run migrations
         env:
