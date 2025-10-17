@@ -10,16 +10,16 @@ jobs:
       postgres:
         image: postgres:15
         env:
-          POSTGRES_DB: test_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-        options: >-
-          --health-cmd "pg_isready -U postgres -d test_db"
-          --health-interval 5s
-          --health-timeout 5s
-          --health-retries 5
+          POSTGRES_DB: test_db
         ports:
-          - 5432:5432  # optional but helps in debugging
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres -d test_db"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
       redis:
         image: redis:7
@@ -37,15 +37,17 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # ✅ Proper Postgres wait (instead of sleep)
-      - name: Wait for Postgres to be ready
+      - name: Wait for Postgres
         run: |
-          echo "Waiting for Postgres service..."
-          until pg_isready -h postgres -U postgres -d test_db; do
-            echo "Postgres not ready yet..."
-            sleep 2
+          echo "Checking Postgres readiness..."
+          for i in {1..15}; do
+            if pg_isready -h postgres -p 5432 -U postgres; then
+              echo "Postgres is ready!"
+              break
+            fi
+            echo "Waiting for Postgres..."
+            sleep 5
           done
-          echo "Postgres is ready!"
 
       - name: Run migrations
         env:
@@ -53,6 +55,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
         run: python manage.py migrate --noinput
 
       - name: Run tests
@@ -61,4 +64,5 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_HOST: postgres
+          POSTGRES_PORT: 5432
         run: python manage.py test products
