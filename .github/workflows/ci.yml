@@ -21,6 +21,14 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
+    env:
+      # Global env vars for Django
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: test_db
+      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_PORT: 5432
+
     steps:
       - uses: actions/checkout@v4
 
@@ -33,37 +41,23 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install psycopg2-binary
 
-      # ✅ Test connectivity to Postgres with psql before migrating
-      - name: Wait for Postgres connection
+      - name: Wait for PostgreSQL to start
         run: |
-          echo "Waiting for Postgres to become available..."
+          echo "⏳ Waiting for PostgreSQL to be ready..."
           for i in {1..20}; do
-            if pg_isready -h postgres -U postgres -d test_db; then
-              echo "✅ Postgres is ready!"
+            if pg_isready -h 127.0.0.1 -p 5432 -U postgres > /dev/null 2>&1; then
+              echo "✅ PostgreSQL is ready!"
               break
             fi
-            echo "⏳ Waiting for Postgres ($i)..."
-            sleep 5
+            echo "Still waiting... ($i)"
+            sleep 3
           done
-
-          echo "Testing psql connection..."
-          PGPASSWORD=postgres psql -h postgres -U postgres -d test_db -c "SELECT 1;" || (echo "❌ Failed to connect to Postgres" && exit 1)
+          PGPASSWORD=postgres psql -h 127.0.0.1 -U postgres -d test_db -c "SELECT 1;"
 
       - name: Run migrations
-        env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
         run: python manage.py migrate --noinput
 
       - name: Run tests
-        env:
-          POSTGRES_DB: test_db
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_HOST: postgres
-          POSTGRES_PORT: 5432
         run: python manage.py test products
